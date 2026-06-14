@@ -1,0 +1,32 @@
+{
+  "name": "programming-cheatsheets-epub",
+  "version": "1.0.0",
+  "description": "Automatically generate programming cheatsheets EPUB book using GitHub Actions",
+  "main": "generate-cheatsheet.js",
+  "scripts": {
+    "generate": "node generate-cheatsheet.js",
+    "generate:cover": "node generate-cover.js",
+    "test": "node test-generate.js"
+  },
+  "keywords": [
+    "epub",
+    "cheatsheets",
+    "programming",
+    "github-actions",
+    "documentation",
+    "ebook"
+  ],
+  "author": "GitHub Actions Bot",
+  "license": "MIT",
+  "dependencies": {
+    "epub-gen": "^0.1.0",
+    "moment": "^2.29.4",
+    "fs-extra": "^11.1.1"
+  },
+  "devDependencies": {
+    "canvas": "^2.11.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
