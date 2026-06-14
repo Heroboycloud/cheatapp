@@ -2,15 +2,15 @@ name: Generate Programming Cheatsheets EPUB
 
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday
-  workflow_dispatch:  # Manual trigger
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
     inputs:
       version_type:
         description: 'Version type (patch, minor, major)'
         required: false
         default: 'patch'
       languages:
-        description: 'Languages (comma-separated: python,javascript,git,sql,docker,bash,react,typescript,vscode,restapi)'
+        description: 'Languages (comma-separated: python,javascript,git)'
         required: false
         default: 'all'
 
@@ -18,14 +18,13 @@ jobs:
   generate-ebook:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Needed to create releases
-      actions: read
-      
+      contents: write
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for proper versioning
+          fetch-depth: 0
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,28 +33,34 @@ jobs:
       
       - name: Install dependencies
         run: |
-          npm install
+          npm init -y
+          npm install epub-gen fs-extra moment
+      
+      - name: List files before generation (debug)
+        run: |
+          echo "Files in repository:"
+          ls -la
+          echo "Checking for generate-cheatsheet.js:"
+          cat generate-cheatsheet.js | head -20
       
       - name: Generate EPUB cheatsheet
         run: node generate-cheatsheet.js
         env:
           VERSION_TYPE: ${{ github.event.inputs.version_type || 'patch' }}
           LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
-          GITHUB_SHA: ${{ github.sha }}
       
-      - name: List output files (debug)
+      - name: List files after generation (debug)
         run: |
-          echo "Checking output directory..."
-          ls -la ./output/ || echo "No output directory yet"
-          if [ -d "./output" ]; then
-            echo "Files in output:"
-            ls -la ./output/
-          fi
+          echo "=== Files after generation ==="
+          ls -la
+          echo "=== Output directory contents ==="
+          ls -la output/ || echo "No output directory!"
+          echo "=== Find any epub files ==="
+          find . -name "*.epub" -type f
       
       - name: Get version and filename
         id: vars
         run: |
-          # Check if version.txt exists
           if [ ! -f "version.txt" ]; then
             echo "version=1.0.0" > version.txt
           fi
@@ -63,17 +68,18 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "filename=Programming-Cheatsheets-$VERSION.epub" >> $GITHUB_OUTPUT
           echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-          echo "Version found: $VERSION"
+          echo "Version: $VERSION"
       
-      - name: Verify EPUB exists
+      - name: Verify EPUB exists before release
         run: |
-          if [ -f "./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub" ]; then
-            echo "✅ EPUB file exists!"
-            ls -lh "./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub"
+          EPUB_FILE="./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub"
+          if [ -f "$EPUB_FILE" ]; then
+            echo "✅ EPUB file found at $EPUB_FILE"
+            ls -lh "$EPUB_FILE"
           else
-            echo "❌ EPUB file not found!"
-            echo "Contents of output directory:"
-            ls -la ./output/ || echo "No output directory"
+            echo "❌ EPUB file NOT found at $EPUB_FILE"
+            echo "Searching for any epub files:"
+            find . -name "*.epub"
             exit 1
           fi
       
@@ -84,25 +90,8 @@ jobs:
           name: "📚 Programming Cheatsheets v${{ steps.vars.outputs.version }}"
           body: |
             ## 📖 Programming Cheatsheets Collection
-            
             **Version:** ${{ steps.vars.outputs.version }}
             **Generated:** ${{ steps.vars.outputs.date }}
-            **Commit:** ${{ github.sha }}
-            
-            ### What's Included:
-            - 🐍 Python Cheatsheet
-            - 📜 JavaScript Cheatsheet
-            - 📦 Git Cheatsheet
-            - 🗄️ SQL Cheatsheet
-            - 🐳 Docker Cheatsheet
-            - 🐚 Bash Cheatsheet
-            - ⚛️ React Cheatsheet
-            - 📘 TypeScript Cheatsheet
-            - 💻 VS Code Cheatsheet
-            - 🌐 REST API Cheatsheet
-            
-            ### Download
-            Download the EPUB file below to get your programming cheatsheets!
             
             *Generated automatically by GitHub Actions*
           draft: false
@@ -112,7 +101,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Upload to workflow artifacts (backup)
+      - name: Upload to workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: cheatsheets-epub

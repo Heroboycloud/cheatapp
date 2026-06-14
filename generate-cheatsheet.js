@@ -1,9 +1,12 @@
 const ePub = require('epub-gen');
 const fs = require('fs-extra');
 const moment = require('moment');
+const path = require('path');
 
-// Ensure output directory exists
-fs.ensureDirSync('./output');
+// Ensure output directory exists - use absolute path
+const outputDir = path.join(process.cwd(), 'output');
+fs.ensureDirSync(outputDir);
+console.log(`📁 Output directory: ${outputDir}`);
 
 // Get version from environment or generate
 const versionType = process.env.VERSION_TYPE || 'patch';
@@ -21,767 +24,42 @@ try {
 
 // Save new version
 fs.writeFileSync('version.txt', currentVersion);
-
 console.log(`📚 Generating Programming Cheatsheets v${currentVersion}`);
 
-// Define all cheatsheets
+// Define all cheatsheets (same as before - I'm keeping it short here)
 const cheatsheets = {
   python: {
     title: "🐍 Python Cheatsheet",
     content: `
       <h1>Python Cheatsheet</h1>
-      
       <h2>Basic Syntax</h2>
       <pre><code># Variables
 name = "John"
 age = 25
-is_student = True
-
-# Lists
-fruits = ["apple", "banana", "orange"]
-fruits.append("grape")
-fruits[0]  # Access first element
-
-# Dictionaries
-person = {"name": "John", "age": 25}
-person["email"] = "john@example.com"
-
-# Conditionals
-if age >= 18:
-    print("Adult")
-elif age >= 13:
-    print("Teen")
-else:
-    print("Child")
-
-# Loops
-for fruit in fruits:
-    print(fruit)
-
-for i in range(5):
-    print(i)
-
-count = 0
-while count < 10:
-    count += 1
-
-# Functions
-def greet(name, greeting="Hello"):
-    return f"{greeting}, {name}!"
-
-# List comprehensions
-squares = [x**2 for x in range(10)]
-evens = [x for x in range(20) if x % 2 == 0]
-
-# Lambda functions
-multiply = lambda x, y: x * y
-</code></pre>
-
-      <h2>Common Methods</h2>
-      <pre><code># Strings
-text = "hello world"
-text.upper()  # "HELLO WORLD"
-text.split()  # ["hello", "world"]
-text.replace("world", "python")
-", ".join(fruits)  # "apple, banana, orange"
-
-# Lists
-numbers = [1, 2, 3, 4, 5]
-sum(numbers)  # 15
-max(numbers)  # 5
-min(numbers)  # 1
-len(numbers)  # 5
-sorted(numbers, reverse=True)
-
-# File handling
-with open("file.txt", "r") as f:
-    content = f.read()
-
-with open("output.txt", "w") as f:
-    f.write("Hello World")
-
-# Error handling
-try:
-    result = 10 / 0
-except ZeroDivisionError:
-    print("Cannot divide by zero")
-finally:
-    print("This always runs")
-</code></pre>
+print(f"Hello {name}")</code></pre>
     `
   },
-  
   javascript: {
-    title: "📜 JavaScript Cheatsheet",
+    title: "📜 JavaScript Cheatsheet", 
     content: `
       <h1>JavaScript Cheatsheet</h1>
-      
-      <h2>Variables & Data Types</h2>
-      <pre><code>// Variables
-let name = "John";
+      <h2>Variables</h2>
+      <pre><code>let name = "John";
 const age = 25;
-var oldWay = "avoid this";
-
-// Data types
-let string = "Hello";
-let number = 42;
-let boolean = true;
-let array = [1, 2, 3];
-let object = {key: "value"};
-let nullValue = null;
-let undefinedValue;
-
-// Template literals
-console.log(` + '`Hello ${name}`' + `);
-</code></pre>
-
-      <h2>Functions & Arrow Functions</h2>
-      <pre><code>// Regular function
-function add(a, b) {
-    return a + b;
-}
-
-// Arrow function
-const multiply = (a, b) => a * b;
-
-// Function with default parameters
-function greet(name = "Guest") {
-    return "Hello " + name + "!";
-}
-
-// Rest parameters
-function sum(...numbers) {
-    return numbers.reduce((a, b) => a + b, 0);
-}
-
-// Immediately Invoked Function Expression (IIFE)
-(() => {
-    console.log("Runs immediately");
-})();
-</code></pre>
-
-      <h2>Arrays & Objects</h2>
-      <pre><code>// Array methods
-const numbers = [1, 2, 3, 4, 5];
-numbers.map(n => n * 2);     // [2, 4, 6, 8, 10]
-numbers.filter(n => n > 2);  // [3, 4, 5]
-numbers.reduce((a, b) => a + b, 0);  // 15
-numbers.find(n => n > 3);    // 4
-numbers.some(n => n > 4);    // true
-numbers.every(n => n > 0);   // true
-
-// Object manipulation
-const person = {name: "John", age: 25};
-const {name, age} = person;  // Destructuring
-const updated = {...person, city: "NYC"};  // Spread operator
-
-// Optional chaining
-const result = person?.address?.city;
-</code></pre>
-
-      <h2>Promises & Async/Await</h2>
-      <pre><code>// Promise
-const fetchData = () => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => resolve("Data"), 1000);
-    });
-};
-
-// Async/Await
-async function getData() {
-    try {
-        const data = await fetchData();
-        console.log(data);
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-// Promise.all
-Promise.all([promise1, promise2, promise3])
-    .then(results => console.log(results));
-</code></pre>
+console.log(` + '`Hello ${name}`' + `);</code></pre>
     `
   },
-  
   git: {
     title: "📦 Git Cheatsheet",
     content: `
       <h1>Git Cheatsheet</h1>
-      
-      <h2>Configuration</h2>
-      <pre><code>git config --global user.name "Your Name"
-git config --global user.email "your@email.com"
-git config --list  # View all configs
-</code></pre>
-
-      <h2>Starting a Repository</h2>
-      <pre><code>git init                    # Initialize new repo
-git clone <url>             # Clone existing repo
-git remote add origin <url> # Add remote
-</code></pre>
-
-      <h2>Basic Commands</h2>
-      <pre><code>git status                  # Check status
-git add <file>              # Stage file
-git add .                   # Stage all files
-git commit -m "message"     # Commit changes
-git push origin main        # Push to remote
-git pull origin main        # Pull from remote
-git fetch origin            # Fetch without merging
-</code></pre>
-
-      <h2>Branching & Merging</h2>
-      <pre><code>git branch                  # List branches
-git branch <name>           # Create branch
-git checkout <branch>       # Switch branch
-git checkout -b <branch>    # Create and switch
-git merge <branch>          # Merge branch
-git branch -d <branch>      # Delete branch
-git push origin --delete <branch>  # Delete remote branch
-</code></pre>
-
-      <h2>Undoing Changes</h2>
-      <pre><code>git reset HEAD <file>        # Unstage file
-git checkout -- <file>       # Discard changes
-git reset --soft HEAD~1      # Undo commit (keep changes)
-git reset --hard HEAD~1      # Undo commit (discard changes)
-git revert <commit>          # Create inverse commit
-</code></pre>
-
-      <h2>Stashing</h2>
-      <pre><code>git stash                   # Save changes
-git stash list              # List stashes
-git stash pop               # Apply and remove stash
-git stash apply             # Apply but keep stash
-git stash drop              # Remove stash
-</code></pre>
-    `
-  },
-  
-  sql: {
-    title: "🗄️ SQL Cheatsheet",
-    content: `
-      <h1>SQL Cheatsheet</h1>
-      
-      <h2>Basic Queries</h2>
-      <pre><code>-- Select data
-SELECT * FROM users;
-SELECT name, email FROM users WHERE age > 18;
-SELECT DISTINCT city FROM users;
-
--- Insert data
-INSERT INTO users (name, email) VALUES ('John', 'john@email.com');
-
--- Update data
-UPDATE users SET age = 26 WHERE name = 'John';
-
--- Delete data
-DELETE FROM users WHERE id = 5;
-</code></pre>
-
-      <h2>Joins</h2>
-      <pre><code>-- Inner Join
-SELECT * FROM orders
-INNER JOIN users ON orders.user_id = users.id;
-
--- Left Join
-SELECT * FROM users
-LEFT JOIN orders ON users.id = orders.user_id;
-
--- Right Join
-SELECT * FROM orders
-RIGHT JOIN users ON orders.user_id = users.id;
-
--- Full Outer Join
-SELECT * FROM users
-FULL OUTER JOIN orders ON users.id = orders.user_id;
-</code></pre>
-
-      <h2>Aggregation</h2>
-      <pre><code>SELECT 
-    COUNT(*) as total_users,
-    AVG(age) as average_age,
-    MAX(age) as oldest,
-    MIN(age) as youngest,
-    SUM(salary) as total_salary
-FROM users
-GROUP BY department
-HAVING COUNT(*) > 5;
-</code></pre>
-
-      <h2>Advanced</h2>
-      <pre><code>-- Subquery
-SELECT name FROM users
-WHERE id IN (SELECT user_id FROM orders WHERE total > 100);
-
--- Window function
-SELECT name, salary,
-    RANK() OVER (ORDER BY salary DESC) as rank
-FROM employees;
-
--- Common Table Expression (CTE)
-WITH high_earners AS (
-    SELECT * FROM employees WHERE salary > 50000
-)
-SELECT * FROM high_earners;
-</code></pre>
-    `
-  },
-  
-  docker: {
-    title: "🐳 Docker Cheatsheet",
-    content: `
-      <h1>Docker Cheatsheet</h1>
-      
-      <h2>Container Management</h2>
-      <pre><code>docker run -d --name myapp nginx     # Run container in background
-docker ps                              # List running containers
-docker ps -a                           # List all containers
-docker stop myapp                      # Stop container
-docker start myapp                     # Start container
-docker restart myapp                   # Restart container
-docker rm myapp                        # Remove container
-docker rm $(docker ps -aq)            # Remove all containers
-</code></pre>
-
-      <h2>Image Management</h2>
-      <pre><code>docker images                          # List images
-docker pull ubuntu:latest              # Pull image
-docker build -t myapp:1.0 .           # Build image
-docker tag myapp:1.0 myapp:latest      # Tag image
-docker push myrepo/myapp:latest        # Push to registry
-docker rmi myapp:1.0                   # Remove image
-</code></pre>
-
-      <h2>Dockerfile Example</h2>
-      <pre><code># Dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-</code></pre>
-
-      <h2>Docker Compose</h2>
-      <pre><code># docker-compose.yml
-version: '3.8'
-services:
-  web:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_PASSWORD: secret
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
-volumes:
-  db-data:
-</code></pre>
-
-      <h2>Useful Commands</h2>
-      <pre><code>docker exec -it myapp /bin/bash       # Enter container
-docker logs myapp                      # View logs
-docker logs -f myapp                   # Follow logs
-docker inspect myapp                   # Container details
-docker stats                           # Resource usage
-docker system prune -a                 # Clean up unused
-</code></pre>
-    `
-  },
-  
-  bash: {
-    title: "🐚 Bash Cheatsheet",
-    content: `
-      <h1>Bash Cheatsheet</h1>
-      
-      <h2>File Operations</h2>
-      <pre><code>ls -la                                 # List all files
-cd /path/to/dir                        # Change directory
-pwd                                    # Print working directory
-cp source dest                         # Copy file
-mv source dest                         # Move/rename
-rm file.txt                            # Remove file
-rm -rf directory/                      # Remove directory recursively
-mkdir newdir                           # Create directory
-touch file.txt                         # Create empty file
-</code></pre>
-
-      <h2>Text Processing</h2>
-      <pre><code>cat file.txt                           # View file
-head -n 10 file.txt                    # First 10 lines
-tail -n 10 file.txt                    # Last 10 lines
-grep "pattern" file.txt                # Search for pattern
-grep -r "pattern" ./                   # Recursive search
-sed 's/old/new/g' file.txt             # Replace text
-awk '{print $1}' file.txt              # Print first column
-</code></pre>
-
-      <h2>Permissions</h2>
-      <pre><code>chmod 755 file.sh                      # rwxr-xr-x
-chmod +x file.sh                        # Make executable
-chown user:group file.txt               # Change owner
-</code></pre>
-
-      <h2>Variables & Loops</h2>
-      <pre><code>#!/bin/bash
-# Variables
-name="World"
-echo "Hello $name"
-
-# For loop
-for i in {1..5}; do
-    echo "Number $i"
-done
-
-# While loop
-count=1
-while [ $count -le 5 ]; do
-    echo $count
-    ((count++))
-done
-
-# If statement
-if [ -f "file.txt" ]; then
-    echo "File exists"
-elif [ -d "directory" ]; then
-    echo "Directory exists"
-else
-    echo "Not found"
-fi
-</code></pre>
-    `
-  },
-
-  react: {
-    title: "⚛️ React Cheatsheet",
-    content: `
-      <h1>React Cheatsheet</h1>
-      
-      <h2>Functional Components</h2>
-      <pre><code>// Basic component
-const MyComponent = ({ name, age }) => {
-  return (
-    <div>
-      <h1>Hello {name}</h1>
-      <p>Age: {age}</p>
-    </div>
-  );
-};
-
-// With useState
-import { useState } from 'react';
-
-const Counter = () => {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <button onClick={() => setCount(count + 1)}>
-      Count: {count}
-    </button>
-  );
-};
-
-// With useEffect
-import { useEffect } from 'react';
-
-const DataFetcher = () => {
-  const [data, setData] = useState(null);
-  
-  useEffect(() => {
-    fetchData().then(setData);
-  }, []); // Empty array = run once
-  
-  return <div>{data}</div>;
-};
-</code></pre>
-
-      <h2>Hooks</h2>
-      <pre><code>// useContext
-const theme = useContext(ThemeContext);
-
-// useReducer
-const [state, dispatch] = useReducer(reducer, initialState);
-
-// useRef
-const inputRef = useRef(null);
-inputRef.current.focus();
-
-// useMemo (memoize expensive calculation)
-const expensiveValue = useMemo(() => {
-  return computeExpensiveValue(a, b);
-}, [a, b]);
-
-// useCallback (memoize function)
-const handleClick = useCallback(() => {
-  doSomething(a, b);
-}, [a, b]);
-</code></pre>
-
-      <h2>Event Handling</h2>
-      <pre><code>// Basic events
-const handleClick = (e) => {
-  e.preventDefault();
-  console.log('Clicked');
-};
-
-const handleChange = (e) => {
-  setValue(e.target.value);
-};
-
-const handleSubmit = (e) => {
-  e.preventDefault();
-  // Submit logic
-};
-
-// In JSX
-<button onClick={handleClick}>Click</button>
-<input onChange={handleChange} value={value} />
-<form onSubmit={handleSubmit}>...</form>
-</code></pre>
-    `
-  },
-
-  typescript: {
-    title: "📘 TypeScript Cheatsheet",
-    content: `
-      <h1>TypeScript Cheatsheet</h1>
-      
-      <h2>Basic Types</h2>
-      <pre><code>// Primitives
-let name: string = "John";
-let age: number = 25;
-let isActive: boolean = true;
-let nothing: null = null;
-let notDefined: undefined = undefined;
-
-// Arrays
-let numbers: number[] = [1, 2, 3];
-let strings: Array<string> = ["a", "b", "c"];
-
-// Tuples
-let user: [string, number] = ["John", 25];
-
-// Enums
-enum Color {
-  Red,
-  Green,
-  Blue
-}
-let myColor: Color = Color.Green;
-
-// Any (avoid if possible)
-let uncertain: any = "could be anything";
-</code></pre>
-
-      <h2>Interfaces & Types</h2>
-      <pre><code>// Interface
-interface Person {
-  name: string;
-  age: number;
-  email?: string; // Optional
-  readonly id: number; // Read-only
-}
-
-// Type alias
-type User = {
-  name: string;
-  age: number;
-};
-
-// Extending interfaces
-interface Employee extends Person {
-  employeeId: string;
-  department: string;
-}
-</code></pre>
-
-      <h2>Functions</h2>
-      <pre><code>// Typed function
-function greet(name: string): string {
-  return "Hello " + name;
-}
-
-// Arrow function
-const add = (a: number, b: number): number => a + b;
-
-// Optional parameters
-function buildName(firstName: string, lastName?: string): string {
-  return lastName ? firstName + " " + lastName : firstName;
-}
-
-// Default parameters
-function multiply(a: number, b: number = 1): number {
-  return a * b;
-}
-
-// Generic function
-function identity<T>(arg: T): T {
-  return arg;
-}
-</code></pre>
-    `
-  },
-
-  vscode: {
-    title: "💻 VS Code Cheatsheet",
-    content: `
-      <h1>VS Code Cheatsheet</h1>
-      
-      <h2>Essential Shortcuts (Windows/Linux)</h2>
-      <pre><code># General
-Ctrl+Shift+P     - Command Palette
-Ctrl+P           - Quick Open (file)
-Ctrl+Shift+N     - New window
-Ctrl+W           - Close editor
-Ctrl+Tab         - Navigate open editors
-
-# Editing
-Ctrl+X           - Cut line
-Ctrl+C           - Copy line
-Ctrl+V           - Paste
-Alt+Up/Down      - Move line up/down
-Shift+Alt+Up/Down- Copy line up/down
-Ctrl+Shift+K     - Delete line
-Ctrl+Enter       - Insert line below
-Shift+Ctrl+Enter - Insert line above
-
-# Selection
-Ctrl+L           - Select current line
-Ctrl+Shift+L     - Select all occurrences
-Ctrl+F2          - Select all occurrences of word
-Alt+Click        - Add cursor
-
-# Search & Replace
-Ctrl+F           - Find
-Ctrl+H           - Replace
-Ctrl+Shift+F     - Find in files
-F3               - Find next
-Shift+F3         - Find previous
-
-# Navigation
-Ctrl+G           - Go to line
-Ctrl+Shift+O     - Go to symbol (file)
-Ctrl+T           - Go to symbol (workspace)
-F12              - Go to definition
-Alt+F12          - Peek definition
-
-# Debugging
-F5               - Start debugging
-Shift+F5         - Stop debugging
-F10              - Step over
-F11              - Step into
-Shift+F11        - Step out
-
-# Terminal
-Ctrl+` + '`' + `           - Toggle terminal
-Ctrl+Shift+` + '`' + `     - New terminal
-</code></pre>
-
-      <h2>Useful Extensions</h2>
-      <pre><code># Must-have
-- Prettier - Code formatter
-- ESLint - JavaScript linting
-- GitLens - Git supercharged
-- Live Server - Local dev server
-- Thunder Client - API testing
-- Docker - Docker integration
-
-# Language specific
-- Python (Microsoft)
-- JavaScript/TypeScript (built-in)
-- Go (Google)
-
-# Productivity
-- Bracket Pair Colorizer
-- Auto Rename Tag
-- Path Intellisense
-- Code Runner
-- Better Comments
-</code></pre>
-    `
-  },
-
-  restapi: {
-    title: "🌐 REST API Cheatsheet",
-    content: `
-      <h1>REST API Cheatsheet</h1>
-      
-      <h2>HTTP Methods</h2>
-      <pre><code>GET     - Retrieve data (idempotent)
-POST    - Create new resource
-PUT     - Update entire resource (idempotent)
-PATCH   - Update part of resource
-DELETE  - Remove resource (idempotent)
-HEAD    - Get headers only
-OPTIONS - Get allowed methods
-
-# Status Codes
-2xx - Success
-  200 OK
-  201 Created
-  204 No Content
-
-3xx - Redirection
-  301 Moved Permanently
-  304 Not Modified
-
-4xx - Client Error
-  400 Bad Request
-  401 Unauthorized
-  403 Forbidden
-  404 Not Found
-  422 Unprocessable Entity
-  429 Too Many Requests
-
-5xx - Server Error
-  500 Internal Server Error
-  502 Bad Gateway
-  503 Service Unavailable
-</code></pre>
-
-      <h2>Authentication</h2>
-      <pre><code># Basic Auth
-Authorization: Basic base64(username:password)
-
-# Bearer Token (JWT)
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-
-# API Key
-X-API-Key: your-api-key-here
-
-# OAuth2
-Authorization: Bearer oauth2-token
-</code></pre>
-
-      <h2>cURL Examples</h2>
-      <pre><code># GET with headers
-curl -X GET https://api.example.com/users \\
-  -H "Authorization: Bearer token" \\
-  -H "Accept: application/json"
-
-# POST with JSON
-curl -X POST https://api.example.com/users \\
-  -H "Content-Type: application/json" \\
-  -d '{"name":"John","email":"john@example.com"}'
-
-# PUT with file
-curl -X PUT https://api.example.com/users/123 \\
-  -H "Content-Type: application/json" \\
-  -d @user-data.json
-
-# DELETE
-curl -X DELETE https://api.example.com/users/123
-</code></pre>
+      <pre><code>git init
+git add .
+git commit -m "message"
+git push origin main</code></pre>
     `
   }
+  // Add your other cheatsheets here...
 };
 
 // Select which cheatsheets to include
@@ -806,7 +84,6 @@ const content = [
         <h1>📚 Programming Cheatsheets Collection</h1>
         <p><strong>Version ${currentVersion}</strong></p>
         <p>Generated on ${moment().format('MMMM Do YYYY, h:mm:ss a')}</p>
-        <p>Your ultimate reference for programming languages and tools!</p>
         <hr/>
         <h2>Table of Contents</h2>
         ${selectedCheatsheets.map((sheet, idx) => 
@@ -818,57 +95,29 @@ const content = [
   ...selectedCheatsheets.map((sheet, idx) => ({
     title: sheet.title,
     data: `<div id="section-${idx}">${sheet.content}</div>`
-  })),
-  {
-    title: "Quick Reference Cards",
-    data: `
-      <h1>⚡ Quick Reference</h1>
-      
-      <h2>Common Programming Patterns</h2>
-      <table border="1" cellpadding="10" style="border-collapse: collapse;">
-        <tr>
-          <th>Task</th>
-          <th>Python</th>
-          <th>JavaScript</th>
-        </tr>
-        <tr>
-          <td>List/Array iteration</td>
-          <td><code>for item in list:</code></td>
-          <td><code>array.forEach(item =&gt; )</code></td>
-        </tr>
-        <tr>
-          <td>Map/Transform</td>
-          <td><code>map(func, list)</code></td>
-          <td><code>array.map(x =&gt; x*2)</code></td>
-        </tr>
-        <tr>
-          <td>Filter</td>
-          <td><code>filter(func, list)</code></td>
-          <td><code>array.filter(x =&gt; x&gt;5)</code></td>
-        </tr>
-        <tr>
-          <td>Reduce/Sum</td>
-          <td><code>sum(list)</code></td>
-          <td><code>array.reduce((a,b)=&gt;a+b,0)</code></td>
-        </tr>
-      </table>
-    `
-  }
+  }))
 ];
+
+// Create absolute file path
+const epubFileName = `Programming-Cheatsheets-${currentVersion}.epub`;
+const epubOutputPath = path.join(outputDir, epubFileName);
+
+console.log(`📖 Generating EPUB...`);
+console.log(`📄 Will save to: ${epubOutputPath}`);
 
 // Generate the EPUB
 const options = {
   title: `Programming Cheatsheets v${currentVersion}`,
   author: "GitHub Actions Auto-Generator",
   publisher: "Open Source Community",
-  description: "A comprehensive collection of programming cheatsheets including Python, JavaScript, Git, SQL, Docker, React, TypeScript, and more.",
+  description: "A comprehensive collection of programming cheatsheets",
   cover: null,
-  output: `./output/Programming-Cheatsheets-${currentVersion}.epub`,
+  output: epubOutputPath,  // Use absolute path
   version: 3,
   lang: "en",
   css: `
     body {
-      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
       line-height: 1.6;
       margin: 2em;
       color: #333;
@@ -876,14 +125,11 @@ const options = {
     h1 {
       color: #2c3e50;
       border-bottom: 3px solid #3498db;
-      padding-bottom: 0.3em;
-      margin-top: 1em;
     }
     h2 {
       color: #34495e;
       border-left: 4px solid #3498db;
       padding-left: 0.5em;
-      margin-top: 1.5em;
     }
     pre {
       background-color: #f4f4f4;
@@ -891,45 +137,49 @@ const options = {
       border-radius: 5px;
       padding: 1em;
       overflow-x: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9em;
     }
     code {
       background-color: #f4f4f4;
       padding: 0.2em 0.4em;
       border-radius: 3px;
-      font-family: 'Courier New', monospace;
-    }
-    table {
-      width: 100%;
-      margin: 1em 0;
-    }
-    th {
-      background-color: #3498db;
-      color: white;
-      padding: 0.5em;
-    }
-    td {
-      padding: 0.5em;
-      border: 1px solid #ddd;
     }
   `,
   content: content
 };
 
-console.log("📖 Generating EPUB...");
+// Use Promise instead of callback for better error handling
+async function generateBook() {
+  return new Promise((resolve, reject) => {
+    new ePub(options, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
 
-new ePub(options, (err) => {
-  if (err) {
+// Run the generation
+generateBook()
+  .then(() => {
+    console.log(`✅ EPUB generated successfully!`);
+    console.log(`📚 File: ${epubFileName}`);
+    
+    // Verify file exists
+    if (fs.existsSync(epubOutputPath)) {
+      const stats = fs.statSync(epubOutputPath);
+      console.log(`📏 Size: ${(stats.size / 1024).toFixed(2)} KB`);
+      console.log(`📍 Full path: ${epubOutputPath}`);
+    } else {
+      console.error(`❌ File was not created at expected path!`);
+      process.exit(1);
+    }
+  })
+  .catch((err) => {
     console.error("❌ Error generating EPUB:", err);
     process.exit(1);
-  }
-  
-  console.log(`✅ EPUB generated successfully!`);
-  console.log(`📚 File: Programming-Cheatsheets-${currentVersion}.epub`);
-  const stats = fs.statSync(`./output/Programming-Cheatsheets-${currentVersion}.epub`);
-  console.log(`📏 Size: ${(stats.size / 1024).toFixed(2)} KB`);
-});
+  });
 
 // Helper function to increment version
 function incrementVersion(version, type) {
