@@ -61,6 +61,7 @@ for fruit in fruits:
 for i in range(5):
     print(i)
 
+count = 0
 while count < 10:
     count += 1
 
@@ -131,7 +132,7 @@ let nullValue = null;
 let undefinedValue;
 
 // Template literals
-
+console.log(` + '`Hello ${name}`' + `);
 </code></pre>
 
       <h2>Functions & Arrow Functions</h2>
@@ -145,7 +146,7 @@ const multiply = (a, b) => a * b;
 
 // Function with default parameters
 function greet(name = "Guest") {
-    return Hello ${name}!;
+    return "Hello " + name + "!";
 }
 
 // Rest parameters
@@ -457,6 +458,329 @@ else
 fi
 </code></pre>
     `
+  },
+
+  react: {
+    title: "⚛️ React Cheatsheet",
+    content: `
+      <h1>React Cheatsheet</h1>
+      
+      <h2>Functional Components</h2>
+      <pre><code>// Basic component
+const MyComponent = ({ name, age }) => {
+  return (
+    <div>
+      <h1>Hello {name}</h1>
+      <p>Age: {age}</p>
+    </div>
+  );
+};
+
+// With useState
+import { useState } from 'react';
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Count: {count}
+    </button>
+  );
+};
+
+// With useEffect
+import { useEffect } from 'react';
+
+const DataFetcher = () => {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    fetchData().then(setData);
+  }, []); // Empty array = run once
+  
+  return <div>{data}</div>;
+};
+</code></pre>
+
+      <h2>Hooks</h2>
+      <pre><code>// useContext
+const theme = useContext(ThemeContext);
+
+// useReducer
+const [state, dispatch] = useReducer(reducer, initialState);
+
+// useRef
+const inputRef = useRef(null);
+inputRef.current.focus();
+
+// useMemo (memoize expensive calculation)
+const expensiveValue = useMemo(() => {
+  return computeExpensiveValue(a, b);
+}, [a, b]);
+
+// useCallback (memoize function)
+const handleClick = useCallback(() => {
+  doSomething(a, b);
+}, [a, b]);
+</code></pre>
+
+      <h2>Event Handling</h2>
+      <pre><code>// Basic events
+const handleClick = (e) => {
+  e.preventDefault();
+  console.log('Clicked');
+};
+
+const handleChange = (e) => {
+  setValue(e.target.value);
+};
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  // Submit logic
+};
+
+// In JSX
+<button onClick={handleClick}>Click</button>
+<input onChange={handleChange} value={value} />
+<form onSubmit={handleSubmit}>...</form>
+</code></pre>
+    `
+  },
+
+  typescript: {
+    title: "📘 TypeScript Cheatsheet",
+    content: `
+      <h1>TypeScript Cheatsheet</h1>
+      
+      <h2>Basic Types</h2>
+      <pre><code>// Primitives
+let name: string = "John";
+let age: number = 25;
+let isActive: boolean = true;
+let nothing: null = null;
+let notDefined: undefined = undefined;
+
+// Arrays
+let numbers: number[] = [1, 2, 3];
+let strings: Array<string> = ["a", "b", "c"];
+
+// Tuples
+let user: [string, number] = ["John", 25];
+
+// Enums
+enum Color {
+  Red,
+  Green,
+  Blue
+}
+let myColor: Color = Color.Green;
+
+// Any (avoid if possible)
+let uncertain: any = "could be anything";
+</code></pre>
+
+      <h2>Interfaces & Types</h2>
+      <pre><code>// Interface
+interface Person {
+  name: string;
+  age: number;
+  email?: string; // Optional
+  readonly id: number; // Read-only
+}
+
+// Type alias
+type User = {
+  name: string;
+  age: number;
+};
+
+// Extending interfaces
+interface Employee extends Person {
+  employeeId: string;
+  department: string;
+}
+</code></pre>
+
+      <h2>Functions</h2>
+      <pre><code>// Typed function
+function greet(name: string): string {
+  return "Hello " + name;
+}
+
+// Arrow function
+const add = (a: number, b: number): number => a + b;
+
+// Optional parameters
+function buildName(firstName: string, lastName?: string): string {
+  return lastName ? firstName + " " + lastName : firstName;
+}
+
+// Default parameters
+function multiply(a: number, b: number = 1): number {
+  return a * b;
+}
+
+// Generic function
+function identity<T>(arg: T): T {
+  return arg;
+}
+</code></pre>
+    `
+  },
+
+  vscode: {
+    title: "💻 VS Code Cheatsheet",
+    content: `
+      <h1>VS Code Cheatsheet</h1>
+      
+      <h2>Essential Shortcuts (Windows/Linux)</h2>
+      <pre><code># General
+Ctrl+Shift+P     - Command Palette
+Ctrl+P           - Quick Open (file)
+Ctrl+Shift+N     - New window
+Ctrl+W           - Close editor
+Ctrl+Tab         - Navigate open editors
+
+# Editing
+Ctrl+X           - Cut line
+Ctrl+C           - Copy line
+Ctrl+V           - Paste
+Alt+Up/Down      - Move line up/down
+Shift+Alt+Up/Down- Copy line up/down
+Ctrl+Shift+K     - Delete line
+Ctrl+Enter       - Insert line below
+Shift+Ctrl+Enter - Insert line above
+
+# Selection
+Ctrl+L           - Select current line
+Ctrl+Shift+L     - Select all occurrences
+Ctrl+F2          - Select all occurrences of word
+Alt+Click        - Add cursor
+
+# Search & Replace
+Ctrl+F           - Find
+Ctrl+H           - Replace
+Ctrl+Shift+F     - Find in files
+F3               - Find next
+Shift+F3         - Find previous
+
+# Navigation
+Ctrl+G           - Go to line
+Ctrl+Shift+O     - Go to symbol (file)
+Ctrl+T           - Go to symbol (workspace)
+F12              - Go to definition
+Alt+F12          - Peek definition
+
+# Debugging
+F5               - Start debugging
+Shift+F5         - Stop debugging
+F10              - Step over
+F11              - Step into
+Shift+F11        - Step out
+
+# Terminal
+Ctrl+` + '`' + `           - Toggle terminal
+Ctrl+Shift+` + '`' + `     - New terminal
+</code></pre>
+
+      <h2>Useful Extensions</h2>
+      <pre><code># Must-have
+- Prettier - Code formatter
+- ESLint - JavaScript linting
+- GitLens - Git supercharged
+- Live Server - Local dev server
+- Thunder Client - API testing
+- Docker - Docker integration
+
+# Language specific
+- Python (Microsoft)
+- JavaScript/TypeScript (built-in)
+- Go (Google)
+
+# Productivity
+- Bracket Pair Colorizer
+- Auto Rename Tag
+- Path Intellisense
+- Code Runner
+- Better Comments
+</code></pre>
+    `
+  },
+
+  restapi: {
+    title: "🌐 REST API Cheatsheet",
+    content: `
+      <h1>REST API Cheatsheet</h1>
+      
+      <h2>HTTP Methods</h2>
+      <pre><code>GET     - Retrieve data (idempotent)
+POST    - Create new resource
+PUT     - Update entire resource (idempotent)
+PATCH   - Update part of resource
+DELETE  - Remove resource (idempotent)
+HEAD    - Get headers only
+OPTIONS - Get allowed methods
+
+# Status Codes
+2xx - Success
+  200 OK
+  201 Created
+  204 No Content
+
+3xx - Redirection
+  301 Moved Permanently
+  304 Not Modified
+
+4xx - Client Error
+  400 Bad Request
+  401 Unauthorized
+  403 Forbidden
+  404 Not Found
+  422 Unprocessable Entity
+  429 Too Many Requests
+
+5xx - Server Error
+  500 Internal Server Error
+  502 Bad Gateway
+  503 Service Unavailable
+</code></pre>
+
+      <h2>Authentication</h2>
+      <pre><code># Basic Auth
+Authorization: Basic base64(username:password)
+
+# Bearer Token (JWT)
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+
+# API Key
+X-API-Key: your-api-key-here
+
+# OAuth2
+Authorization: Bearer oauth2-token
+</code></pre>
+
+      <h2>cURL Examples</h2>
+      <pre><code># GET with headers
+curl -X GET https://api.example.com/users \\
+  -H "Authorization: Bearer token" \\
+  -H "Accept: application/json"
+
+# POST with JSON
+curl -X POST https://api.example.com/users \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"John","email":"john@example.com"}'
+
+# PUT with file
+curl -X PUT https://api.example.com/users/123 \\
+  -H "Content-Type: application/json" \\
+  -d @user-data.json
+
+# DELETE
+curl -X DELETE https://api.example.com/users/123
+</code></pre>
+    `
   }
 };
 
@@ -510,36 +834,24 @@ const content = [
         <tr>
           <td>List/Array iteration</td>
           <td><code>for item in list:</code></td>
-          <td><code>array.forEach(item => )</code></td>
+          <td><code>array.forEach(item =&gt; )</code></td>
         </tr>
         <tr>
           <td>Map/Transform</td>
           <td><code>map(func, list)</code></td>
-          <td><code>array.map(x => x*2)</code></td>
+          <td><code>array.map(x =&gt; x*2)</code></td>
         </tr>
         <tr>
           <td>Filter</td>
           <td><code>filter(func, list)</code></td>
-          <td><code>array.filter(x => x>5)</code></td>
+          <td><code>array.filter(x =&gt; x&gt;5)</code></td>
         </tr>
         <tr>
           <td>Reduce/Sum</td>
           <td><code>sum(list)</code></td>
-          <td><code>array.reduce((a,b)=>a+b,0)</code></td>
+          <td><code>array.reduce((a,b)=&gt;a+b,0)</code></td>
         </tr>
       </table>
-      
-      <h2>Keyboard Shortcuts (VS Code)</h2>
-      <ul>
-        <li><strong>Ctrl+P</strong> - Quick file open</li>
-        <li><strong>Ctrl+Shift+P</strong> - Command palette</li>
-        <li><strong>Ctrl+Shift+F</strong> - Find in files</li>
-        <li><strong>Ctrl+Shift+L</strong> - Select all occurrences</li>
-        <li><strong>Alt+Up/Down</strong> - Move line</li>
-        <li><strong>Ctrl+D</strong> - Add selection to next match</li>
-        <li><strong>Ctrl+/</strong> - Toggle line comment</li>
-        <li><strong>F5</strong> - Start debugging</li>
-      </ul>
     `
   }
 ];
@@ -549,8 +861,8 @@ const options = {
   title: `Programming Cheatsheets v${currentVersion}`,
   author: "GitHub Actions Auto-Generator",
   publisher: "Open Source Community",
-  description: "A comprehensive collection of programming cheatsheets including Python, JavaScript, Git, SQL, Docker, and more.",
-  cover: null,  // You can add a cover image URL here
+  description: "A comprehensive collection of programming cheatsheets including Python, JavaScript, Git, SQL, Docker, React, TypeScript, and more.",
+  cover: null,
   output: `./output/Programming-Cheatsheets-${currentVersion}.epub`,
   version: 3,
   lang: "en",
@@ -601,12 +913,6 @@ const options = {
       padding: 0.5em;
       border: 1px solid #ddd;
     }
-    .issue {
-      margin: 1em 0;
-      padding: 1em;
-      background-color: #f9f9f9;
-      border-left: 4px solid #3498db;
-    }
   `,
   content: content
 };
@@ -621,7 +927,8 @@ new ePub(options, (err) => {
   
   console.log(`✅ EPUB generated successfully!`);
   console.log(`📚 File: Programming-Cheatsheets-${currentVersion}.epub`);
-  console.log(`📏 Size: ${fs.statSync(`./output/Programming-Cheatsheets-${currentVersion}.epub`).size / 1024} KB`);
+  const stats = fs.statSync(`./output/Programming-Cheatsheets-${currentVersion}.epub`);
+  console.log(`📏 Size: ${(stats.size / 1024).toFixed(2)} KB`);
 });
 
 // Helper function to increment version
