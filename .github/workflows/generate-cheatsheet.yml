@@ -1,18 +1,12 @@
 name: Generate Programming Cheatsheets EPUB
 
 on:
-  schedule:
-    - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version type (patch, minor, major)'
+        description: 'Version type'
         required: false
         default: 'patch'
-      languages:
-        description: 'Languages (comma-separated: python,javascript,git)'
-        required: false
-        default: 'all'
 
 jobs:
   generate-ebook:
@@ -21,89 +15,40 @@ jobs:
       contents: write
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
       
       - name: Install dependencies
         run: |
-          npm init -y
           npm install epub-gen fs-extra moment
       
-      - name: List files before generation (debug)
-        run: |
-          echo "Files in repository:"
-          ls -la
-          echo "Checking for generate-cheatsheet.js:"
-          cat generate-cheatsheet.js | head -20
-      
-      - name: Generate EPUB cheatsheet
+      - name: Generate EPUB
         run: node generate-cheatsheet.js
         env:
           VERSION_TYPE: ${{ github.event.inputs.version_type || 'patch' }}
-          LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
       
-      - name: List files after generation (debug)
+      - name: Get version
+        id: version
         run: |
-          echo "=== Files after generation ==="
-          ls -la
-          echo "=== Output directory contents ==="
-          ls -la output/ || echo "No output directory!"
-          echo "=== Find any epub files ==="
-          find . -name "*.epub" -type f
-      
-      - name: Get version and filename
-        id: vars
-        run: |
-          if [ ! -f "version.txt" ]; then
-            echo "version=1.0.0" > version.txt
-          fi
           VERSION=$(cat version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "filename=Programming-Cheatsheets-$VERSION.epub" >> $GITHUB_OUTPUT
-          echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
       
-      - name: Verify EPUB exists before release
+      - name: List files (debug)
         run: |
-          EPUB_FILE="./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub"
-          if [ -f "$EPUB_FILE" ]; then
-            echo "✅ EPUB file found at $EPUB_FILE"
-            ls -lh "$EPUB_FILE"
-          else
-            echo "❌ EPUB file NOT found at $EPUB_FILE"
-            echo "Searching for any epub files:"
-            find . -name "*.epub"
-            exit 1
-          fi
+          echo "Current directory: $(pwd)"
+          echo "Output directory:"
+          ls -la output/ || echo "No output directory"
+          echo "Find epub:"
+          find . -name "*.epub"
       
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: Create Release
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: cheatsheets-v${{ steps.vars.outputs.version }}
-          name: "📚 Programming Cheatsheets v${{ steps.vars.outputs.version }}"
-          body: |
-            ## 📖 Programming Cheatsheets Collection
-            **Version:** ${{ steps.vars.outputs.version }}
-            **Generated:** ${{ steps.vars.outputs.date }}
-            
-            *Generated automatically by GitHub Actions*
-          draft: false
-          prerelease: false
-          files: |
-            ./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Upload to workflow artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: cheatsheets-epub
-          path: ./output/*.epub
-          retention-days: 30
+          tag: cheatsheets-v${{ steps.version.outputs.version }}
+          name: "Cheatsheets v${{ steps.version.outputs.version }}"
+          artifacts: "output/*.epub"
+          artifactErrorsFailBuild: true
+          token: ${{ secrets.GITHUB_TOKEN }}
