@@ -131,7 +131,7 @@ let nullValue = null;
 let undefinedValue;
 
 // Template literals
-console.log(`Hello ${name}, you are ${age} years old`);
+
 </code></pre>
 
       <h2>Functions & Arrow Functions</h2>
