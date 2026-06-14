@@ -10,7 +10,7 @@ on:
         required: false
         default: 'patch'
       languages:
-        description: 'Languages to include (comma-separated: js,python,java,go,ruby)'
+        description: 'Languages'
         required: false
         default: 'all'
 
@@ -19,37 +19,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Needed to create releases
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
       - name: Install dependencies
         run: |
           npm install epub-gen@0.1.0
           npm install moment@2.29.4
           npm install fs-extra@11.1.1
-      
       - name: Generate EPUB cheatsheet
         run: node generate-cheatsheet.js
         env:
           VERSION_TYPE: ${{ github.event.inputs.version_type || 'patch' }}
           LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
           GITHUB_SHA: ${{ github.sha }}
-      
       - name: Get version and filename
         id: vars
         run: |
           VERSION=$(cat version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "filename=Programming-Cheatsheets-$VERSION.epub" >> $GITHUB_OUTPUT
+          echo "filename=Cheatsheets-$VERSION.epub" >> $GITHUB_OUTPUT
           echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-      
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -57,11 +51,9 @@ jobs:
           name: "📚 Programming Cheatsheets v${{ steps.vars.outputs.version }}"
           body: |
             ## 📖 Programming Cheatsheets Collection
-            
             **Version:** ${{ steps.vars.outputs.version }}
             **Generated:** ${{ steps.vars.outputs.date }}
             **Commit:** ${{ github.sha }}
-            
             ### What's Included:
             - 🐍 Python Cheatsheet
             - 📜 JavaScript Cheatsheet
@@ -72,10 +64,8 @@ jobs:
             - 🐚 Bash Cheatsheet
             - 🐳 Docker Cheatsheet
             - 📦 Git Cheatsheet
-            
             ### Download
             Download the EPUB file below to get your programming cheatsheets!
-            
             *Generated automatically by GitHub Actions*
           draft: false
           prerelease: false
@@ -83,21 +73,9 @@ jobs:
             ./output/${{ steps.vars.outputs.filename }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
       - name: Upload to workflow artifacts (backup)
         uses: actions/upload-artifact@v4
         with:
           name: cheatsheets-epub
           path: ./output/*.epub
           retention-days: 30
-
-      - name: Send Telegram notification (optional)
-        if: secrets.TELEGRAM_BOT_TOKEN != ''
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_GROUP_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: |
-            📚 *New Cheatsheets Released!*
-            Version: ${{ steps.vars.outputs.version }}
-            Download: https://github.com/${{ github.repository }}/releases/tag/cheatsheets-v${{ steps.vars.outputs.version }}
