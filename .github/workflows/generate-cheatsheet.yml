@@ -4,14 +4,13 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Weekly on Sunday
   workflow_dispatch:  # Manual trigger
-  push:
     inputs:
       version_type:
         description: 'Version type (patch, minor, major)'
         required: false
         default: 'patch'
       languages:
-        description: 'Languages'
+        description: 'Languages (comma-separated: python,javascript,git,sql,docker,bash,react,typescript,vscode,restapi)'
         required: false
         default: 'all'
 
@@ -20,31 +19,64 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Needed to create releases
+      actions: read
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper versioning
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+      
       - name: Install dependencies
         run: |
-          npm install epub-gen@0.1.0
-          npm install moment@2.29.4
-          npm install fs-extra@11.1.1
+          npm install
+      
       - name: Generate EPUB cheatsheet
         run: node generate-cheatsheet.js
         env:
           VERSION_TYPE: ${{ github.event.inputs.version_type || 'patch' }}
           LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
           GITHUB_SHA: ${{ github.sha }}
+      
+      - name: List output files (debug)
+        run: |
+          echo "Checking output directory..."
+          ls -la ./output/ || echo "No output directory yet"
+          if [ -d "./output" ]; then
+            echo "Files in output:"
+            ls -la ./output/
+          fi
+      
       - name: Get version and filename
         id: vars
         run: |
+          # Check if version.txt exists
+          if [ ! -f "version.txt" ]; then
+            echo "version=1.0.0" > version.txt
+          fi
           VERSION=$(cat version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "filename=Cheatsheets-$VERSION.epub" >> $GITHUB_OUTPUT
+          echo "filename=Programming-Cheatsheets-$VERSION.epub" >> $GITHUB_OUTPUT
           echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "Version found: $VERSION"
+      
+      - name: Verify EPUB exists
+        run: |
+          if [ -f "./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub" ]; then
+            echo "✅ EPUB file exists!"
+            ls -lh "./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub"
+          else
+            echo "❌ EPUB file not found!"
+            echo "Contents of output directory:"
+            ls -la ./output/ || echo "No output directory"
+            exit 1
+          fi
+      
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -52,28 +84,34 @@ jobs:
           name: "📚 Programming Cheatsheets v${{ steps.vars.outputs.version }}"
           body: |
             ## 📖 Programming Cheatsheets Collection
+            
             **Version:** ${{ steps.vars.outputs.version }}
             **Generated:** ${{ steps.vars.outputs.date }}
             **Commit:** ${{ github.sha }}
+            
             ### What's Included:
             - 🐍 Python Cheatsheet
             - 📜 JavaScript Cheatsheet
-            - ☕ Java Cheatsheet
-            - 🚀 Go Cheatsheet
-            - 💎 Ruby Cheatsheet
-            - 🗄️ SQL Cheatsheet
-            - 🐚 Bash Cheatsheet
-            - 🐳 Docker Cheatsheet
             - 📦 Git Cheatsheet
+            - 🗄️ SQL Cheatsheet
+            - 🐳 Docker Cheatsheet
+            - 🐚 Bash Cheatsheet
+            - ⚛️ React Cheatsheet
+            - 📘 TypeScript Cheatsheet
+            - 💻 VS Code Cheatsheet
+            - 🌐 REST API Cheatsheet
+            
             ### Download
             Download the EPUB file below to get your programming cheatsheets!
+            
             *Generated automatically by GitHub Actions*
           draft: false
           prerelease: false
           files: |
-            ./output/${{ steps.vars.outputs.filename }}
+            ./output/Programming-Cheatsheets-${{ steps.vars.outputs.version }}.epub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Upload to workflow artifacts (backup)
         uses: actions/upload-artifact@v4
         with:
